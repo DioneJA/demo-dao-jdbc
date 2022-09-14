@@ -44,13 +44,14 @@ public class SellerDAOimplJDBC implements SellerDAO {
 				if (rs.next()) {
 					int id = rs.getInt(1);
 					seller.setId(id);
+					DB.closeResultSet(rs);
 				}
 			} else {
 				throw new DBException("ERROR! No rows affected!");
 			}
 		} catch (SQLException e) {
 			throw new DBException("ERROR! Caused by " + e.getMessage());
-		}finally {
+		} finally {
 			DB.closeStatement(ps);
 		}
 	}
@@ -68,11 +69,11 @@ public class SellerDAOimplJDBC implements SellerDAO {
 			ps.setDouble(4, seller.getBaseSalary());
 			ps.setInt(5, seller.getDep().getId());
 			ps.setInt(6, seller.getId());
-			
+
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw new DBException("ERROR! Caused by " + e.getMessage());
-		}finally {
+		} finally {
 			DB.closeStatement(ps);
 		}
 	}
@@ -84,10 +85,10 @@ public class SellerDAOimplJDBC implements SellerDAO {
 			st = conn.prepareStatement("DELETE FROM seller WHERE id = ?");
 			st.setInt(1, id);
 			st.executeUpdate();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DBException("ERROR! Caused by " + e.getMessage());
 			// TODO: handle exception
-		}finally {
+		} finally {
 			DB.closeStatement(st);
 		}
 	}
@@ -113,24 +114,6 @@ public class SellerDAOimplJDBC implements SellerDAO {
 			DB.closeResultSet(rs);
 			DB.closeStatement(ps);
 		}
-	}
-
-	private Seller instanciateSeller(ResultSet rs, Department dep) throws SQLException {
-		Seller sl = new Seller();
-		sl.setId(rs.getInt("id"));
-		sl.setName(rs.getString("name"));
-		sl.setEmail(rs.getString("email"));
-		sl.setBirthDate(rs.getDate("birthdate"));
-		sl.setBaseSalary(rs.getDouble("basesalary"));
-		sl.setDep(dep);
-		return sl;
-	}
-
-	private Department instanciateDepartment(ResultSet rs) throws SQLException {
-		Department dep = new Department();
-		dep.setId(rs.getInt("departmentid"));
-		dep.setName(rs.getString("depname"));
-		return dep;
 	}
 
 	@Override
@@ -191,4 +174,21 @@ public class SellerDAOimplJDBC implements SellerDAO {
 		}
 	}
 
+	private Seller instanciateSeller(ResultSet rs, Department dep) throws SQLException {
+		Seller sl = new Seller();
+		sl.setId(rs.getInt("id"));
+		sl.setName(rs.getString("name"));
+		sl.setEmail(rs.getString("email"));
+		sl.setBirthDate(rs.getDate("birthdate"));
+		sl.setBaseSalary(rs.getDouble("basesalary"));
+		sl.setDep(dep);
+		return sl;
+	}
+
+	private Department instanciateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department();
+		dep.setId(rs.getInt("departmentid"));
+		dep.setName(rs.getString("depname"));
+		return dep;
+	}
 }

@@ -15,7 +15,7 @@ public class Program {
 
 	public static void main(String[] args) throws ParseException {
 		Scanner sc = new Scanner(System.in);
-		
+
 		SellerDAO sellerDao = DaoFactory.createSellerDao();
 
 		System.out.println("==== TESTE 1: seller findById =====");
@@ -29,23 +29,27 @@ public class Program {
 		System.out.println("\n==== TESTE 3: seller findByAll =====");
 		List<Seller> seller3 = sellerDao.findAll();
 		seller3.forEach(System.out::println);
-		
+
 		System.out.println("\n==== TESTE 5: seller insert =====");
 		Date date = new SimpleDateFormat("dd/MM/yyyy").parse("03/20/2001");
-		Seller seller4 = new Seller(0, "Bruno Alves", "bruno@gmail.com", date, 2500.00, new Department(2, "Electronics"));
+		Seller seller4 = new Seller(0, "Bruno Alves", "bruno@gmail.com", date, 2500.00,
+				new Department(2, "Electronics"));
 		sellerDao.insert(seller4);
 		System.out.println("Sucefull inserction! Id: " + seller4.getId());
-		
+
 		System.out.println("\n==== TESTE 6: seller update =====");
-		Seller seller5 = sellerDao.findById(1);
+		Seller seller5 = sellerDao.findById(2);
 		seller5.setName("ATUALIZADO");
 		sellerDao.update(seller5);
 		System.out.println("Sucefull updated!");
-		
+
 		System.out.println("\n==== TESTE 6: seller update =====");
 		System.out.print("Enter id for delete test: ");
 		int id = sc.nextInt();
 		sellerDao.deleteById(id);
 		System.out.println("Sucefull deletion! ");
+		
+		System.out.println("\n\n--------------- Department Impl Test ---------------");
+		sc.close();
 	}
 }
