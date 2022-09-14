@@ -1,5 +1,5 @@
 # demo-dao-jdbc
-<p>Exercício sobre Banco de dados em java, utilizando DAO e  mysql</p>
+<p>Banco de dados em java, utilizando DAO e  mysql</p>
 <br>
 <p>Para utilizar, basta alterar o properties.txt dentro da pasta para seu banco de dados</p>
 <h2>Script do BD: </h2>
