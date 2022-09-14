@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mysql.jdbc.Statement;
+
 import db.DB;
 import db.DBException;
 import models.dao.SellerDAO;
@@ -24,14 +26,55 @@ public class SellerDAOimplJDBC implements SellerDAO {
 
 	@Override
 	public void insert(Seller seller) {
-		// TODO Auto-generated method stub
+		PreparedStatement ps = null;
 
+		try {
+			ps = conn.prepareStatement(
+					"INSERT INTO seller(name,email,birthdate,basesalary,departmentid)" + " values(?,?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, seller.getName());
+			ps.setString(2, seller.getEmail());
+			ps.setDate(3, new java.sql.Date(seller.getBirthDate().getTime()));
+			ps.setDouble(4, seller.getBaseSalary());
+			ps.setInt(5, seller.getDep().getId());
+
+			int rows = ps.executeUpdate();
+			if (rows > 0) {
+				ResultSet rs = ps.getGeneratedKeys();
+				if (rs.next()) {
+					int id = rs.getInt(1);
+					seller.setId(id);
+				}
+			} else {
+				throw new DBException("ERROR! No rows affected!");
+			}
+		} catch (SQLException e) {
+			throw new DBException("ERROR! Caused by " + e.getMessage());
+		}finally {
+			DB.closeStatement(ps);
+		}
 	}
 
 	@Override
-	public void update(Seller Seller) {
-		// TODO Auto-generated method stub
+	public void update(Seller seller) {
+		PreparedStatement ps = null;
 
+		try {
+			ps = conn.prepareStatement(
+					"UPDATE seller SET name = ?, email=?, birthdate=?,basesalary=?,departmentid=? Where id = ?");
+			ps.setString(1, seller.getName());
+			ps.setString(2, seller.getEmail());
+			ps.setDate(3, new java.sql.Date(seller.getBirthDate().getTime()));
+			ps.setDouble(4, seller.getBaseSalary());
+			ps.setInt(5, seller.getDep().getId());
+			ps.setInt(6, seller.getId());
+			
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DBException("ERROR! Caused by " + e.getMessage());
+		}finally {
+			DB.closeStatement(ps);
+		}
 	}
 
 	@Override
@@ -85,26 +128,26 @@ public class SellerDAOimplJDBC implements SellerDAO {
 	public List<Seller> findAll() {
 		PreparedStatement st = null;
 		ResultSet rs = null;
-		
+
 		try {
 			st = conn.prepareStatement("select seller.*, department.name as depname from seller Join"
 					+ " department ON department.id = departmentid");
 			rs = st.executeQuery();
-			
-			Map<Integer,Department> map = new HashMap<>();
+
+			Map<Integer, Department> map = new HashMap<>();
 			List<Seller> sl = new ArrayList<Seller>();
-			while(rs.next()) {
+			while (rs.next()) {
 				Department dep = map.get(rs.getInt("departmentid"));
-				if(dep==null) {
+				if (dep == null) {
 					dep = instanciateDepartment(rs);
 					map.put(rs.getInt("departmentid"), dep);
-					
+
 				}
 				Seller seller = instanciateSeller(rs, dep);
 				sl.add(seller);
 			}
 			return sl;
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			// TODO: handle exception
 			throw new DBException("ERROR! Caused by " + e.getMessage());
 		}
